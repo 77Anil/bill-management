@@ -1,5 +1,6 @@
 package com.billnex.billManage;
 
+import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
@@ -7,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
+@EnableEncryptableProperties
 public class BillManagementApplication {
 
 	@Bean
