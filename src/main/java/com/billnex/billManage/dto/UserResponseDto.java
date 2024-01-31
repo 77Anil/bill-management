@@ -1,5 +1,7 @@
 package com.billnex.billManage.dto;
 
+import com.billnex.billManage.entity.Role;
+import com.billnex.billManage.entity.UserDetails;
 import com.billnex.billManage.entity.UserStatus;
 import lombok.*;
 
@@ -22,6 +24,8 @@ public class UserResponseDto {
     private String email;
 
     private UserStatus status;
+
+    private Role role;
 
     private LocalDateTime createdOn;
 

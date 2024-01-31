@@ -2,14 +2,16 @@ package com.billnex.billManage.controller;
 
 import com.billnex.billManage.dto.UserRequestDto;
 import com.billnex.billManage.dto.UserResponseDto;
-import com.billnex.billManage.service.Impl.UserServiceImpl;
+import com.billnex.billManage.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -22,10 +24,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
+@ActiveProfiles("test")
+@AutoConfigureMockMvc(addFilters = false)
 public class UserControllerTest {
 
     @MockBean
-    UserServiceImpl userServiceImpl;
+    UserService userservice;
 
     @Autowired
     MockMvc mockMvc;
@@ -40,6 +44,7 @@ public class UserControllerTest {
                 .name("Anil")
                 .department("CSE")
                 .email("test@gmail.com")
+                .password("password")
                 .build();
 
 
@@ -49,7 +54,7 @@ public class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
-        verify(userServiceImpl, times(1)).addUser(any(UserRequestDto.class));
+        verify(userservice, times(1)).addUser(any(UserRequestDto.class));
 
     }
 
@@ -71,7 +76,7 @@ public class UserControllerTest {
 
         List<UserResponseDto> userResponses = Arrays.asList(userResponseDto1, userResponseDto2);
 
-        when(userServiceImpl.getAllUsers()).thenReturn(userResponses);
+        when(userservice.getAllUsers()).thenReturn(userResponses);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/v1/users"))
@@ -79,7 +84,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.size()", Matchers.is(2)))
                 .andExpect(jsonPath("$[0].name").value("Anil"));
 
-        verify(userServiceImpl, times(1)).getAllUsers();
+        verify(userservice, times(1)).getAllUsers();
 
     }
 
@@ -92,7 +97,7 @@ public class UserControllerTest {
                 .email("test@gmail.com")
                 .build();
 
-        when(userServiceImpl.getUserById(anyString())).thenReturn(userResponse);
+        when(userservice.getUserById(anyString())).thenReturn(userResponse);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/v1/users/abc"))
@@ -100,7 +105,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.id").value("abc"))
                 .andExpect(jsonPath("$.name").value("Anil"));
 
-        verify(userServiceImpl, times(1)).getUserById(anyString());
+        verify(userservice, times(1)).getUserById(anyString());
 
     }
 
@@ -118,7 +123,7 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(userServiceImpl, times(1)).updateUserById(anyString(), any(UserRequestDto.class));
+        verify(userservice, times(1)).updateUserById(anyString(), any(UserRequestDto.class));
 
     }
 
@@ -129,7 +134,7 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(userServiceImpl, times(1)).deleteUserById(anyString());
+        verify(userservice, times(1)).deleteUserById(anyString());
 
     }
 

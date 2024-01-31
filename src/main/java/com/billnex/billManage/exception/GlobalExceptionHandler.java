@@ -26,19 +26,26 @@ public class GlobalExceptionHandler {
         return new ResponseEntity(new ExceptionResponse(e.getMessage()), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({Exception.class})
-    public ResponseEntity handleOtherException(Exception e) {
-        HttpStatus serverErrorCode = HttpStatus.INTERNAL_SERVER_ERROR;
-        if(e instanceof NoResourceFoundException){
-            serverErrorCode = HttpStatus.NOT_FOUND;
-        }
-        return new ResponseEntity(new ExceptionResponse(e.getMessage()),serverErrorCode);
-    }
+//    @ExceptionHandler({Exception.class})
+//    public ResponseEntity handleOtherException(Exception e) {
+//        HttpStatus serverErrorCode = HttpStatus.INTERNAL_SERVER_ERROR;
+//        if(e instanceof NoResourceFoundException){
+//            serverErrorCode = HttpStatus.NOT_FOUND;
+//        }
+//        return new ResponseEntity(new ExceptionResponse(e.getMessage()),serverErrorCode);
+//    }
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity handleValidationException(MethodArgumentNotValidException ex) {
         Optional<ObjectError> errorMessage = ex.getBindingResult().getAllErrors().stream().findFirst();
-        return new ResponseEntity<Object>(new ExceptionResponse(errorMessage.get().getDefaultMessage()), HttpStatus.BAD_REQUEST);
+
+        String fieldName = errorMessage
+                .filter(error -> error instanceof FieldError)
+                .map(error -> ((FieldError) error).getField())
+                .orElse("");
+
+        String message = fieldName +" - "+ errorMessage.get().getDefaultMessage();
+        return new ResponseEntity<Object>(new ExceptionResponse(message), HttpStatus.BAD_REQUEST);
     }
 
 }

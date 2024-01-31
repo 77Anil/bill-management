@@ -6,6 +6,7 @@ import com.billnex.billManage.entity.User;
 import com.billnex.billManage.exception.NotFoundException;
 import com.billnex.billManage.repository.UserRepository;
 import com.billnex.billManage.service.Impl.UserServiceImpl;
+import com.billnex.billManage.utils.CommonDBMethods;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,22 +34,42 @@ public class UserServiceImplTest {
     @Mock
     private ModelMapper modelMapper;
 
+    @Mock
+    CommonDBMethods commonDBMethods;
 
+
+    private User createUserInstance(String mail){
+        return User.builder()
+                .email(mail)
+                .department("CSE")
+                .password("password")
+                .name("Anil")
+                .build();
+    }
+
+    private UserRequestDto createUserRequestDto(String mail){
+        return UserRequestDto.builder()
+                .email(mail)
+                .department("CSE")
+                .password("password")
+                .name("Anil")
+                .build();
+    }
+
+    private UserResponseDto createUserResponseDto(String mail){
+        return UserResponseDto.builder()
+                .email(mail)
+                .department("CSE")
+                .name("Anil")
+                .build();
+    }
 
     @Test
     public void userService_CreateUser_Return201(){
 
-        User user = User.builder()
-                .email("test@gmail.com")
-                .department("CSE")
-                .name("Anil")
-                .build();
+        User user = createUserInstance("test@gmail.com");
 
-        UserRequestDto userRequestDto = UserRequestDto.builder()
-                .name("Anil")
-                .department("CSE")
-                .email("test@gmail.com")
-                .build();
+        UserRequestDto userRequestDto = createUserRequestDto("test@gmail.com");
 
         when(modelMapper.map(userRequestDto, User.class)).thenReturn(user);
 
@@ -58,32 +79,14 @@ public class UserServiceImplTest {
 
     @Test
     public void userService_GetAllUsers_ReturnUsers(){
-        User user1 = User.builder()
-                .email("test@gmail.com")
-                .department("CSE")
-                .name("Anil")
-                .build();
-        User user2 = User.builder()
-                .email("test@gmail.com")
-                .department("CSE")
-                .name("Sunil")
-                .build();
+        User user1 = createUserInstance("test@gmail.com");
+        User user2 = createUserInstance("testtow@gmail.com");
 
         List<User> users = Arrays.asList(user1, user2);
 
-        UserResponseDto userResponseDto1 = UserResponseDto.builder()
-                .name("Anil")
-                .id("abc")
-                .department("CSE")
-                .email("test@gmail.com")
-                .build();
+        UserResponseDto userResponseDto1 = createUserResponseDto("test@gmail.com");
 
-        UserResponseDto userResponseDto2 = UserResponseDto.builder()
-                .name("Sunil")
-                .id("abc")
-                .department("CSE")
-                .email("test@gmail.com")
-                .build();
+        UserResponseDto userResponseDto2 = createUserResponseDto("testtow@gmail.com");
 
         List<UserResponseDto> userResponses = Arrays.asList(userResponseDto1, userResponseDto2);
 
@@ -100,19 +103,9 @@ public class UserServiceImplTest {
     @Test
     public void userService_GetUserById_ReturnUser(){
 
-        User user = User.builder()
-                .email("test@gmail.com")
-                .id("abc")
-                .department("CSE")
-                .name("Anil")
-                .build();
+        User user = createUserInstance("testtow@gmail.com");
 
-        UserResponseDto userResponseDto = UserResponseDto.builder()
-                .name("Anil")
-                .id("abc")
-                .department("CSE")
-                .email("test@gmail.com")
-                .build();
+        UserResponseDto userResponseDto = createUserResponseDto("testtow@gmail.com");
 
         when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
         when(modelMapper.map(user, UserResponseDto.class)).thenReturn(userResponseDto);
@@ -133,14 +126,9 @@ public class UserServiceImplTest {
     @Test
     public void userService_DeleteUserById_Return200(){
 
-        User user = User.builder()
-                .email("test@gmail.com")
-                .id("abc")
-                .department("CSE")
-                .name("Anil")
-                .build();
+        User user = createUserInstance("testtow@gmail.com");
 
-        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+        when(commonDBMethods.findUserById(anyString())).thenReturn(user);
 
         userServiceImpl.deleteUserById("abc");
 
@@ -150,11 +138,7 @@ public class UserServiceImplTest {
     @Test
     public void userService_UpdateUserById_Return200(){
 
-        User user = User.builder()
-                .email("test@gmail.com")
-                .department("CSE")
-                .name("Anil")
-                .build();
+        User user = createUserInstance("testtow@gmail.com");
 
 
 
@@ -162,7 +146,7 @@ public class UserServiceImplTest {
                 .name("Sunil")
                 .build();
 
-        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+        when(commonDBMethods.findUserById(anyString())).thenReturn(user);
 
         userServiceImpl.updateUserById("abc", userRequestDto);
 
